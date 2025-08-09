@@ -1,0 +1,64 @@
+def ler_matrizes(arquivo):
+    with open(arquivo, 'r') as f:
+        linhas = [linha.strip() for linha in f if linha.strip() != '']
+    matrizes = []
+    matriz = []
+    for linha in linhas:
+        if linha == '@':
+            matrizes.append(matriz)
+            matriz = []
+        else:
+            matriz.append([int(x) for x in linha.split()])
+    matrizes.append(matriz)
+    return matrizes
+
+def eh_quadrada(matriz):
+    return all(len(linha) == len(matriz) for linha in matriz)
+
+def soma(a, b):
+    return a + b
+
+def multiplica(a, b):
+    return a * b
+
+def multiplica_matrizes(A, B):
+    n = len(A)
+    resultado = [[0]*n for _ in range(n)]
+    passos = []
+    for i in range(n):
+        for j in range(n):
+            soma_elemento = 0
+            detalhes = []
+            for k in range(n):
+                mult = multiplica(A[i][k], B[k][j])
+                soma_elemento = soma(soma_elemento, mult)
+                detalhes.append(f"{A[i][k]}*{B[k][j]}={mult}")
+            resultado[i][j] = soma_elemento
+            passos.append(f"C[{i+1}][{j+1}] = " + " + ".join(detalhes) + f" = {soma_elemento}")
+    return resultado, passos
+
+def imprime_matriz(matriz, nome):
+    print(f"{nome}:")
+    for linha in matriz:
+        print(" ".join(str(x) for x in linha))
+    print()
+
+if __name__ == "__main__":
+    matrizes = ler_matrizes('data/matrizes.txt')
+    if len(matrizes) < 2:
+        print("Arquivo deve conter pelo menos duas matrizes separadas por '@'")
+        exit(1)
+    A, B = matrizes[0], matrizes[1]
+    if not eh_quadrada(A) or not eh_quadrada(B):
+        print("As matrizes não são quadradas.")
+        exit(1)
+    if len(A) != len(B):
+        print("As matrizes não têm o mesmo tamanho.")
+        exit(1)
+    imprime_matriz(A, "Matriz A")
+    imprime_matriz(B, "Matriz B")
+    resultado, passos = multiplica_matrizes(A, B)
+    print("Passo a passo da multiplicação:")
+    for passo in passos:
+        print(passo)
+    imprime_matriz(resultado, "Matriz Resultado")
